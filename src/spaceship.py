@@ -26,7 +26,6 @@ class Spaceship:
 
     @x.setter
     def x(self, x):
-        # Add any validation if needed
         self.__x = x
 
     @property
