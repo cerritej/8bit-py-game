@@ -1,18 +1,21 @@
 # projectile.py
 import pygame
 
-
 class Projectile:
-    def __init__(self, x, y, width, height, speed, length):
+    def __init__(self, x, y, width, height, speed, length, direction):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.speed = speed
         self.length = length
+        self.direction = direction  # New parameter to store the direction of the projectile
 
     def move(self):
-        self.y -= self.speed
+        if self.direction == "up":
+            self.y -= self.speed
+        elif self.direction == "down":
+            self.y += self.speed
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.length))

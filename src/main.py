@@ -1,4 +1,3 @@
-# main.py
 import pygame
 import sys
 from spaceship import Spaceship
@@ -12,14 +11,19 @@ def main():
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("8bit Game")
     white = (255, 255, 255)
+    black = (0, 0, 0)
 
-    player_spaceship = Spaceship(name="Player", x=width // 2, y=height - 60, width=50, height=50)
+    player_spaceship = Spaceship(name="Player", x=width // 2, y=height - 60, width=50, height=50, lives=5)
 
     # Create lists to store projectiles for both player and enemy
     player_projectiles = []
     enemy_projectiles = []
 
-    enemy = Enemy(x=width - 60, y=height - 60, width=50, height=50, speed=-2, shoot_rate=2000)  # Adjust speed and shoot_rate as needed
+    enemy = Enemy(x=60, y=60, width=50, height=50, speed=-2,
+                  shoot_rate=2000)  # Adjust speed and shoot_rate as needed
+
+    # Font for displaying text
+    font = pygame.font.Font(None, 36)
 
     clock = pygame.time.Clock()
 
@@ -47,7 +51,8 @@ def main():
                                             width=10,
                                             height=player_spaceship.height,
                                             speed=10,
-                                            length=player_spaceship.height)
+                                            length=player_spaceship.height,
+                                            direction="up")
                 player_projectiles.append(new_projectile)
                 last_player_shot_time = current_time
 
@@ -76,13 +81,17 @@ def main():
                          (player_spaceship.x, player_spaceship.y, player_spaceship.width, player_spaceship.height))
 
         # Draw the enemy with the updated color
-        pygame.draw.rect(screen, enemy.color, (enemy.x, enemy.y, enemy.width, enemy.height))
+        pygame.draw.rect(screen, enemy.get_color(), (enemy.x, enemy.y, enemy.width, enemy.height))
 
         # Draw projectiles
         for projectile in player_projectiles:
             pygame.draw.rect(screen, (0, 255, 0), (projectile.x, projectile.y, projectile.width, projectile.length))
         for projectile in enemy_projectiles:
             pygame.draw.rect(screen, (255, 0, 0), (projectile.x, projectile.y, projectile.width, projectile.length))
+
+        # Draw player lives
+        lives_text = font.render(f"Lives: {player_spaceship.lives}", True, black)
+        screen.blit(lives_text, (10, 10))  # Adjust the position as needed
 
         pygame.display.flip()
         clock.tick(60)

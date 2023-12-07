@@ -1,10 +1,11 @@
 class Spaceship:
-    def __init__(self, name, x, y, width, height):
+    def __init__(self, name, x, y, width, height, lives=5):
         self.__name = name
         self.__x = x
         self.__y = y
         self.__width = width
         self.__height = height
+        self.__lives = lives
 
     @property
     def name(self):
@@ -52,6 +53,28 @@ class Spaceship:
     def height(self, height):
         self.__height = height
 
+    @property
+    def lives(self):
+        return self.__lives
+
+    @lives.setter
+    def lives(self, new_lives):
+        if new_lives < 0:
+            raise ValueError("Lives cannot be negative.")
+        self.__lives = new_lives
+
+    def decrement_lives(self):
+        if self.__lives > 0:
+            self.__lives -= 1
+
+    def increment_lives(self):
+        if self.__lives > 0:
+            self.__lives += 1
+
     def move(self, dx, dy):
-        self.__x += dx
+        # Ensure the spaceship stays within the screen boundaries in the x-direction
+        new_x = self.__x + dx
+        if 0 <= new_x <= (800 - self.__width):  # Max x-bounds, dependent on the screen width
+            self.__x = new_x
+
         self.__y += dy
