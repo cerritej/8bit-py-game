@@ -1,25 +1,19 @@
+# spaceship.py
+import pygame
+
 class Spaceship:
-    def __init__(self, name, x, y, width, height, lives=5):
+    def __init__(self, name, x, y, width, height):
         self.__name = name
         self.__x = x
         self.__y = y
         self.__width = width
         self.__height = height
-        self.__lives = lives
+        self.__lives = 5
+        self.__hit_by_projectile = False  # Flag to track if the spaceship has been hit by a projectile
 
     @property
     def name(self):
         return self.__name
-
-    @name.setter
-    def name(self, name):
-        if not name:
-            raise ValueError("Name cannot be blank.")
-        if not isinstance(name, str):
-            raise ValueError("Name must be a string.")
-        if len(name) > 255:
-            raise ValueError("Name cannot be over 255 chars.")
-        self.__name = name
 
     @property
     def x(self):
@@ -78,3 +72,16 @@ class Spaceship:
             self.__x = new_x
 
         self.__y += dy
+
+    def is_hit_by_enemy(self, projectile):
+        if not self.__hit_by_projectile and (self.__x < projectile.x < self.__x + self.__width) and (
+                self.__y < projectile.y < self.__y + self.__height):
+            print(f"Spaceship hit by enemy projectile: {self.__x}, {self.__y}, {self.__width}, {self.__height}")
+            self.__hit_by_projectile = True  # Set the flag to True to indicate the spaceship has been hit
+            return True
+        return False
+
+    def reset_hit_status(self):
+        # Reset hit status for the next frame
+        self.__hit_by_projectile = False
+

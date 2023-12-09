@@ -9,7 +9,7 @@ class Projectile:
         self.height = height
         self.speed = speed
         self.length = length
-        self.direction = direction  # New parameter to store the direction of the projectile
+        self.direction = direction
 
     def move(self):
         if self.direction == "up":

@@ -1,12 +1,14 @@
 import pygame
 from projectile import Projectile
 
+
 class Enemy:
-    def __init__(self, x, y, width, height, speed, shoot_rate):
+    def __init__(self, eid, x, y, speed, shoot_rate):
+        self.__eid = eid
         self.__x = x
         self.__y = y
-        self.__width = width
-        self.__height = height
+        self.__width = 50
+        self.__height = 50
         self.__speed = speed
         self.__shoot_rate = shoot_rate
         self.__last_shot_time = 0
@@ -14,6 +16,14 @@ class Enemy:
         self.__color = (255, 0, 0)
         self.__destroyed_time = None
         self.__direction = -1
+
+    @property
+    def eid(self):
+        return self.__eid
+
+    @eid.setter
+    def eid(self, new_eid):
+        self.__eid = new_eid
 
     @property
     def x(self):
@@ -114,9 +124,10 @@ class Enemy:
             else:
                 return None
 
-    def is_hit(self, projectile):
+    def is_hit_by_player(self, projectile):
         if self.__is_alive:
-            hit_condition = (self.__x < projectile.x < self.__x + self.__width) and (self.__y < projectile.y < self.__y + self.__height)
+            hit_condition = (self.__x < projectile.x < self.__x + self.__width) and (
+                        self.__y < projectile.y < self.__y + self.__height)
             if hit_condition:
                 self.__is_alive = False
                 self.__color = (0, 0, 0)
