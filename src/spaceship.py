@@ -1,4 +1,3 @@
-# spaceship.py
 import pygame
 
 class Spaceship:
@@ -10,6 +9,8 @@ class Spaceship:
         self.__height = height
         self.__lives = 5
         self.__hit_by_projectile = False  # Flag to track if the spaceship has been hit by a projectile
+        self.__hit_cooldown = 1000  # Cooldown period in milliseconds
+        self.__last_hit_time = 0
 
     @property
     def name(self):
@@ -66,22 +67,24 @@ class Spaceship:
             self.__lives += 1
 
     def move(self, dx, dy):
-        # Ensure the spaceship stays within the screen boundaries in the x-direction
         new_x = self.__x + dx
-        if 0 <= new_x <= (800 - self.__width):  # Max x-bounds, dependent on the screen width
+        if 0 <= new_x <= (800 - self.__width):
             self.__x = new_x
-
         self.__y += dy
 
     def is_hit_by_enemy(self, projectile):
         if not self.__hit_by_projectile and (self.__x < projectile.x < self.__x + self.__width) and (
                 self.__y < projectile.y < self.__y + self.__height):
-            print(f"Spaceship hit by enemy projectile: {self.__x}, {self.__y}, {self.__width}, {self.__height}")
-            self.__hit_by_projectile = True  # Set the flag to True to indicate the spaceship has been hit
-            return True
+            current_time = pygame.time.get_ticks()
+            time_since_last_hit = current_time - self.__last_hit_time
+
+            if time_since_last_hit > self.__hit_cooldown:
+                print(f"Spaceship hit by enemy projectile: {self.__x}, {self.__y}, {self.__width}, {self.__height}")
+                self.__hit_by_projectile = True
+                self.__last_hit_time = current_time
+                return True
+
         return False
 
     def reset_hit_status(self):
-        # Reset hit status for the next frame
         self.__hit_by_projectile = False
-

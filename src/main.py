@@ -1,4 +1,3 @@
-# main.py
 import pygame
 import sys
 from spaceship import Spaceship
@@ -63,11 +62,16 @@ def main():
             if new_enemy_projectile:
                 enemy_projectiles.append(new_enemy_projectile)
 
-        # Update projectile positions
-        for projectile in player_projectiles:
-            projectile.move()
+        # Check for collisions with player spaceship
+        player_spaceship_hit = False
         for projectile in enemy_projectiles:
-            projectile.move()
+            if player_spaceship.is_hit_by_enemy(projectile):
+                player_spaceship_hit = True
+
+        if player_spaceship_hit:
+            print("Player spaceship hit!")
+            player_spaceship.reset_hit_status()  # Reset hit status for the next frame
+            player_spaceship.decrement_lives()  # Decrement lives when hit
 
         # Check for collisions and remove enemies immediately
         enemies_to_remove = []
@@ -77,8 +81,6 @@ def main():
                     # Handle enemy hit
                     print(f"Enemy {enemy.eid} hit!")
                     enemies_to_remove.append(enemy)
-                    player_spaceship.reset_hit_status()  # Reset hit status for the next frame
-                    player_spaceship.decrement_lives()  # Decrement lives when hit
 
         for enemy in enemies_to_remove:
             enemies.remove(enemy)
@@ -88,17 +90,11 @@ def main():
                 enemies.extend([Enemy(eid=2, x=100, y=100, speed=-2, shoot_rate=2000),
                                 Enemy(eid=3, x=700, y=100, speed=-2, shoot_rate=2000)])
 
-        # Check for collisions with player spaceship
-        player_spaceship_hit = False
+        # Update projectile positions
+        for projectile in player_projectiles:
+            projectile.move()
         for projectile in enemy_projectiles:
-            if player_spaceship.is_hit_by_enemy(projectile):
-                player_spaceship_hit = True
-
-        if player_spaceship_hit:
-            print("Player spaceship hit!")
-
-        # Reset hit status for the next frame
-        player_spaceship.reset_hit_status()
+            projectile.move()
 
         screen.fill(white)
 
