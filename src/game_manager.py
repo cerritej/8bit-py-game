@@ -16,6 +16,8 @@ class GameManager:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("8bit Game")
         self.white = (255, 255, 255)
+        self.black = (0, 0, 0)
+        self.red = (255, 0, 0)
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
         self.last_player_shot_time = 0
@@ -28,6 +30,7 @@ class GameManager:
         self.player_projectiles = []
         self.enemy_projectiles = []
         self.enemies = [Enemy(eid=1, x=60, y=60, speed=-2, shoot_rate=2000)]
+        self.score = 0  # Reset score to 0 on restart
 
     def handle_input(self):
         for event in pygame.event.get():
@@ -124,21 +127,26 @@ class GameManager:
                                  (projectile.x, projectile.y, projectile.width, projectile.length))
 
             # Draw player lives
-            lives_text = self.font.render(f"Lives: {self.player_spaceship.lives}", True, (0, 0, 0))
+            lives_text = self.font.render(f"Lives: {self.player_spaceship.lives}", True, self.black)
             self.screen.blit(lives_text, (10, 10))  # Adjust the position as needed
 
             # Draw score
-            score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
+            score_text = self.font.render(f"Score: {self.score}", True, self.black)
             self.screen.blit(score_text, (120, 10))  # Adjust the position as needed
         else:
             # Player has no lives left, display "Game Over" message
-            game_over_text = self.font.render("Game Over", True, (255, 0, 0))  # Use red color
+            game_over_text = self.font.render("Game Over", True, self.red)
             text_rect = game_over_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
             self.screen.blit(game_over_text, text_rect)
 
+            # Display the final score in black
+            final_score_text = self.font.render(f"Final Score: {self.score}", True, self.black)
+            final_score_rect = final_score_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 30))
+            self.screen.blit(final_score_text, final_score_rect)
+
             # Prompt to restart the game
-            restart_text = self.font.render("Press R to restart", True, (0, 0, 0))
-            restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 50))
+            restart_text = self.font.render("Press R to restart", True, self.black)
+            restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 70))
             self.screen.blit(restart_text, restart_rect)
 
             keys = pygame.key.get_pressed()
