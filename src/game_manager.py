@@ -6,18 +6,28 @@ from enemy import Enemy
 from projectile import Projectile
 
 class GameManager:
+    player_spaceship = None  # Default value at the class level
+    player_projectiles = []   # Default value at the class level
+    enemy_projectiles = []    # Default value at the class level
+    enemies = []             # Default value at the class level
+
     def __init__(self, width, height):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("8bit Game")
         self.white = (255, 255, 255)
         self.clock = pygame.time.Clock()
-        self.player_spaceship = Spaceship(name="Player", x=width // 2, y=height - 60, width=50, height=50)
+        self.font = pygame.font.Font(None, 36)
+        self.last_player_shot_time = 0
+        self.score = 0  # Initialize score
+        self.reset_game()
+
+    def reset_game(self):
+        self.player_spaceship = Spaceship(name="Player", x=self.screen.get_width() // 2,
+                                          y=self.screen.get_height() - 60, width=50, height=50)
         self.player_projectiles = []
         self.enemy_projectiles = []
         self.enemies = [Enemy(eid=1, x=60, y=60, speed=-2, shoot_rate=2000)]
-        self.font = pygame.font.Font(None, 36)
-        self.last_player_shot_time = 0
 
     def handle_input(self):
         for event in pygame.event.get():
@@ -75,6 +85,7 @@ class GameManager:
                     # Handle enemy hit
                     print(f"Enemy {enemy.eid} hit!")
                     enemies_to_remove.append(enemy)
+                    self.score += 10  # Increase the score when an enemy is hit
 
         for enemy in enemies_to_remove:
             self.enemies.remove(enemy)
@@ -82,7 +93,7 @@ class GameManager:
             # If the enemy with ID 1 is hit, spawn two new enemies
             if enemy.eid == 1:
                 self.enemies.extend([Enemy(eid=2, x=100, y=100, speed=-2, shoot_rate=2000),
-                                    Enemy(eid=3, x=700, y=100, speed=-2, shoot_rate=2000)])
+                                     Enemy(eid=3, x=700, y=100, speed=-2, shoot_rate=2000)])
 
     def check_player_collision(self):
         player_spaceship_hit = any(
@@ -96,24 +107,43 @@ class GameManager:
     def draw_objects(self):
         self.screen.fill(self.white)
 
-        # Draw the player spaceship
-        self.player_spaceship.draw(self.screen)
+        if self.player_spaceship.lives > 0:
+            # Draw the player spaceship
+            self.player_spaceship.draw(self.screen)
 
-        # Draw the enemies with the updated color
-        for enemy in self.enemies:
-            pygame.draw.rect(self.screen, enemy.get_color(), (enemy.x, enemy.y, enemy.width, enemy.height))
+            # Draw the enemies with the updated color
+            for enemy in self.enemies:
+                pygame.draw.rect(self.screen, enemy.get_color(), (enemy.x, enemy.y, enemy.width, enemy.height))
 
-        # Draw projectiles
-        for projectile in self.player_projectiles:
-            pygame.draw.rect(self.screen, (0, 255, 0),
-                             (projectile.x, projectile.y, projectile.width, projectile.length))
-        for projectile in self.enemy_projectiles:
-            pygame.draw.rect(self.screen, (255, 0, 0),
-                             (projectile.x, projectile.y, projectile.width, projectile.length))
+            # Draw projectiles
+            for projectile in self.player_projectiles:
+                pygame.draw.rect(self.screen, (0, 255, 0),
+                                 (projectile.x, projectile.y, projectile.width, projectile.length))
+            for projectile in self.enemy_projectiles:
+                pygame.draw.rect(self.screen, (255, 0, 0),
+                                 (projectile.x, projectile.y, projectile.width, projectile.length))
 
-        # Draw player lives
-        lives_text = self.font.render(f"Lives: {self.player_spaceship.lives}", True, (0, 0, 0))
-        self.screen.blit(lives_text, (10, 10))  # Adjust the position as needed
+            # Draw player lives
+            lives_text = self.font.render(f"Lives: {self.player_spaceship.lives}", True, (0, 0, 0))
+            self.screen.blit(lives_text, (10, 10))  # Adjust the position as needed
+
+            # Draw score
+            score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
+            self.screen.blit(score_text, (120, 10))  # Adjust the position as needed
+        else:
+            # Player has no lives left, display "Game Over" message
+            game_over_text = self.font.render("Game Over", True, (255, 0, 0))  # Use red color
+            text_rect = game_over_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+            self.screen.blit(game_over_text, text_rect)
+
+            # Prompt to restart the game
+            restart_text = self.font.render("Press R to restart", True, (0, 0, 0))
+            restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 50))
+            self.screen.blit(restart_text, restart_rect)
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_r]:
+                self.reset_game()  # Restart the game if the player presses 'R'
 
         pygame.display.flip()
         self.clock.tick(60)
