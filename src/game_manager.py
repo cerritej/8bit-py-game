@@ -4,12 +4,14 @@ import sys
 from spaceship import Spaceship
 from enemy import Enemy
 from projectile import Projectile
+import random
+
 
 class GameManager:
     player_spaceship = None  # Default value at the class level
-    player_projectiles = []   # Default value at the class level
-    enemy_projectiles = []    # Default value at the class level
-    enemies = []             # Default value at the class level
+    player_projectiles = []  # Default value at the class level
+    enemy_projectiles = []  # Default value at the class level
+    enemies = []  # Default value at the class level
 
     def __init__(self, width, height):
         pygame.init()
@@ -118,6 +120,27 @@ class GameManager:
                                          Enemy(eid=11, x=400, y=100, speed=-4, shoot_rate=750),
                                          Enemy(eid=12, x=700, y=100, speed=-2, shoot_rate=500)])
 
+        # Check if all enemies are destroyed, then trigger randomization for the next group
+        if not self.enemies:
+            # Determine whether to use random values for the next group
+            if all(e.eid >= 12 for e in enemies_to_remove):
+                # Randomize characteristics for the next group
+                next_group_size = random.randint(1, 4)
+                next_group_start_id = max(e.eid for e in enemies_to_remove) + 1
+
+                next_group = [
+                    Enemy(
+                        eid=i,
+                        x=random.randint(100, 700),
+                        y=random.randint(50, 150),
+                        speed=random.uniform(-3, -6),
+                        shoot_rate=random.randint(500, 1000),
+                    )
+                    for i in range(next_group_start_id, next_group_start_id + next_group_size)
+                ]
+
+                self.enemies.extend(next_group)
+
     def check_player_collision(self):
         player_spaceship_hit = any(
             [self.player_spaceship.is_hit_by_enemy(projectile) for projectile in self.enemy_projectiles]
@@ -161,12 +184,14 @@ class GameManager:
 
             # Display the final score in black
             final_score_text = self.font.render(f"Final Score: {self.score}", True, self.black)
-            final_score_rect = final_score_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 30))
+            final_score_rect = final_score_text.get_rect(
+                center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 30))
             self.screen.blit(final_score_text, final_score_rect)
 
             # Prompt to restart the game
             restart_text = self.font.render("Press R to restart", True, self.black)
-            restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 70))
+            restart_rect = restart_text.get_rect(
+                center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 70))
             self.screen.blit(restart_text, restart_rect)
 
             keys = pygame.key.get_pressed()
@@ -176,6 +201,7 @@ class GameManager:
         pygame.display.flip()
         self.clock.tick(60)
 
+
 def main():
     game_manager = GameManager(width=800, height=600)
 
@@ -183,6 +209,7 @@ def main():
         game_manager.handle_input()
         game_manager.update_game_state()
         game_manager.draw_objects()
+
 
 if __name__ == "__main__":
     main()
