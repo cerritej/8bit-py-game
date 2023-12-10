@@ -6,14 +6,21 @@ from enemy import Enemy
 from projectile import Projectile
 import random
 
-
 class GameManager:
+    # Class-level variables to track game state
     player_spaceship = None  # Default value at the class level
     player_projectiles = []  # Default value at the class level
     enemy_projectiles = []  # Default value at the class level
     enemies = []  # Default value at the class level
 
     def __init__(self, width, height):
+        """
+        Initializes the game manager with the specified width and height.
+
+        Args:
+            width (int): Width of the game window.
+            height (int): Height of the game window.
+        """
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("8bit Game")
@@ -27,6 +34,9 @@ class GameManager:
         self.reset_game()
 
     def reset_game(self):
+        """
+        Resets the game state to the initial configuration.
+        """
         self.player_spaceship = Spaceship(name="Player", x=self.screen.get_width() // 2,
                                           y=self.screen.get_height() - 60, width=50, height=50)
         self.player_projectiles = []
@@ -35,6 +45,9 @@ class GameManager:
         self.score = 0  # Reset score to 0 on restart
 
     def handle_input(self):
+        """
+        Handles user input events, such as key presses and window close.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -49,6 +62,9 @@ class GameManager:
             self.shoot_projectile()
 
     def shoot_projectile(self):
+        """
+        Fires a projectile from the player's spaceship if the cooldown time has passed.
+        """
         current_time = pygame.time.get_ticks()
         time_since_last_shot = current_time - self.last_player_shot_time
         if time_since_last_shot > 200:
@@ -63,6 +79,9 @@ class GameManager:
             self.last_player_shot_time = current_time
 
     def update_game_state(self):
+        """
+        Updates the game state, including moving objects, handling collisions, and updating scores.
+        """
         for enemy in self.enemies:
             enemy.move()
             new_enemy_projectile = enemy.shoot_projectile()
@@ -83,6 +102,9 @@ class GameManager:
         self.player_spaceship.update_blinking()
 
     def check_enemy_collisions(self):
+        """
+        Checks for collisions between player projectiles and enemies, updating scores and spawning new enemies.
+        """
         enemies_to_remove = []
         for projectile in self.player_projectiles:
             for enemy in self.enemies:
@@ -142,6 +164,9 @@ class GameManager:
                 self.enemies.extend(next_group)
 
     def check_player_collision(self):
+        """
+        Checks for collisions between enemy projectiles and the player's spaceship, updating lives and hit status.
+        """
         player_spaceship_hit = any(
             [self.player_spaceship.is_hit_by_enemy(projectile) for projectile in self.enemy_projectiles]
         )
@@ -151,6 +176,9 @@ class GameManager:
             self.player_spaceship.decrement_lives()  # Decrement lives when hit
 
     def draw_objects(self):
+        """
+        Draws game objects on the screen, including the player's spaceship, enemies, projectiles, lives, and score.
+        """
         self.screen.fill(self.white)
 
         if self.player_spaceship.lives > 0:
@@ -200,16 +228,3 @@ class GameManager:
 
         pygame.display.flip()
         self.clock.tick(60)
-
-
-def main():
-    game_manager = GameManager(width=800, height=600)
-
-    while True:
-        game_manager.handle_input()
-        game_manager.update_game_state()
-        game_manager.draw_objects()
-
-
-if __name__ == "__main__":
-    main()

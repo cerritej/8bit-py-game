@@ -1,9 +1,19 @@
+# enemy.py
 import pygame
 from projectile import Projectile
 
-
 class Enemy:
     def __init__(self, eid, x, y, speed, shoot_rate):
+        """
+        Initializes an enemy with specified characteristics.
+
+        Args:
+            eid (int): Enemy ID.
+            x (int): Initial x-coordinate.
+            y (int): Initial y-coordinate.
+            speed (int): Speed of the enemy.
+            shoot_rate (int): Rate at which the enemy can shoot projectiles.
+        """
         self.__eid = eid
         self.__x = x
         self.__y = y
@@ -82,12 +92,27 @@ class Enemy:
         self.__is_alive = new_is_alive
 
     def get_color(self):
+        """
+        Returns the color of the enemy.
+
+        Returns:
+            Tuple: RGB color tuple.
+        """
         return self.__color
 
     def get_destroyed_time(self):
+        """
+        Returns the time when the enemy was destroyed.
+
+        Returns:
+            int: Time in milliseconds.
+        """
         return self.__destroyed_time
 
     def move(self):
+        """
+        Moves the enemy horizontally, handles boundary conditions, and resets position if necessary.
+        """
         if self.__is_alive:
             self.__x += self.__speed * self.__direction
 
@@ -107,6 +132,12 @@ class Enemy:
                 self.__is_alive = False
 
     def shoot_projectile(self):
+        """
+        Fires a projectile if the enemy is alive and enough time has passed since the last shot.
+
+        Returns:
+            Projectile: A new projectile if conditions are met, otherwise None.
+        """
         if self.__is_alive:
             current_time = pygame.time.get_ticks()
             time_since_last_shot = current_time - self.__last_shot_time
@@ -125,6 +156,15 @@ class Enemy:
                 return None
 
     def is_hit_by_player(self, projectile):
+        """
+        Checks if the enemy is hit by a player's projectile.
+
+        Args:
+            projectile (Projectile): The player's projectile.
+
+        Returns:
+            bool: True if hit, False otherwise.
+        """
         if self.__is_alive:
             hit_condition = (self.__x < projectile.x < self.__x + self.__width) and (
                         self.__y < projectile.y < self.__y + self.__height)
