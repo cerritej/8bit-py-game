@@ -97,6 +97,26 @@ class GameManager:
             if enemy.eid == 1:
                 self.enemies.extend([Enemy(eid=2, x=100, y=100, speed=-2, shoot_rate=2000),
                                      Enemy(eid=3, x=700, y=100, speed=-2, shoot_rate=2000)])
+            elif enemy.eid == 2 or enemy.eid == 3:
+                # If enemies with ID 2 and 3 are both destroyed, spawn a new enemy with ID 4
+                if all(e.eid not in [2, 3] for e in self.enemies):
+                    self.enemies.append(Enemy(eid=4, x=50, y=50, speed=-6, shoot_rate=750))
+            elif enemy.eid == 4:
+                # If enemy with ID 4 is destroyed, spawn three new enemies with ID 5, 6, and 7
+                self.enemies.extend([Enemy(eid=5, x=100, y=100, speed=-2, shoot_rate=2000),
+                                     Enemy(eid=6, x=400, y=100, speed=-2, shoot_rate=2000),
+                                     Enemy(eid=7, x=700, y=100, speed=-2, shoot_rate=2000)])
+            elif enemy.eid == 5 or enemy.eid == 6 or enemy.eid == 7:
+                # If enemies with ID 5, 6, and 7 are all destroyed, spawn two new enemies with ID 8 and 9
+                if all(e.eid not in [5, 6, 7] for e in self.enemies):
+                    self.enemies.extend([Enemy(eid=8, x=100, y=100, speed=-4, shoot_rate=750),
+                                         Enemy(eid=9, x=700, y=100, speed=-4, shoot_rate=750)])
+            elif enemy.eid == 8 or enemy.eid == 9:
+                # If enemies with ID 8 and 9 are both destroyed, spawn three new enemies with ID 10, 11, and 12
+                if all(e.eid not in [8, 9] for e in self.enemies):
+                    self.enemies.extend([Enemy(eid=10, x=100, y=100, speed=-6, shoot_rate=1000),
+                                         Enemy(eid=11, x=400, y=100, speed=-4, shoot_rate=750),
+                                         Enemy(eid=12, x=700, y=100, speed=-2, shoot_rate=500)])
 
     def check_player_collision(self):
         player_spaceship_hit = any(
